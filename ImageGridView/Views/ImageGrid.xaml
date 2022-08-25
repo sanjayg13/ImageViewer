@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="ImageViewer.ImageGridView.Views.ImageGrid"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:ImageViewer.ImageGridView.Converters" xmlns:views="clr-namespace:ImageViewer.ImageGridView.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <DataTemplate x:Key="ImageGridViewControl">
+            <views:ImageListView DataContext="{Binding Path=DataContext,RelativeSource={RelativeSource AncestorType={x:Type views:ImageGrid}}}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="ExtendedImageViewControl">
+            <views:ExtendedImageView DataContext="{Binding Path=DataContext,RelativeSource={RelativeSource AncestorType={x:Type views:ImageGrid}}}"/>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid x:Name="ImageRootGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <ContentControl x:Name="ImageGridViewContentControl" AutomationProperties.AutomationId="ImageGridViewContentControl"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch" ContentTemplate="{StaticResource ImageGridViewControl}">
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ElementName=ExtendedImageViewContentControl,Path=Visibility}" Value="Visible">
+                            <Setter Property="Visibility" Value="Collapsed"></Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ElementName=ExtendedImageViewContentControl,Path=Visibility}" Value="Collapsed">
+                            <Setter Property="Visibility" Value="Visible"></Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
+        <ContentControl x:Name="ExtendedImageViewContentControl" AutomationProperties.AutomationId="ExtendedImageViewContentControl"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch" ContentTemplate="{StaticResource ExtendedImageViewControl}">
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding  RelativeSource={RelativeSource AncestorType={x:Type views:ImageGrid}}, Path=DataContext.SelectedImageModel.Url, Converter={x:Static converters:StringEmptyOrNullCheckConverter.Instance}}" Value="false" />
+                                <Condition Binding="{Binding  RelativeSource={RelativeSource AncestorType={x:Type views:ImageGrid}}, Path=DataContext.SelectedImageIndex, Converter={x:Static converters:SelectionToBooleanConverter.Instance}}" Value="true"/>
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.Setters>
+                                <Setter Property="Visibility" Value="Visible" />
+                            </MultiDataTrigger.Setters>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
+    </Grid>
+
+</UserControl>
